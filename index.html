@@ -24,16 +24,30 @@
     $.ajax({
       url: urlapi,
       method: "GET",
-      success: function(data){
-        const v = document.getElementById("tampilan");
-        const l = document.getElementById("lokasi");
+      <!-- Ubah isi success callback -->
+success: function(data){
+  const v = document.getElementById("tampilan");
+  const l = document.getElementById("lokasi");
 
-        let suhu = data.current.temp_c;
-        let lokasi = data.location.name;
+  const suhu = data.current.temp_c;
+  const lokasi = data.location.name;
+  const negara = data.location.country;
+  const region = data.location.region;
+  const lat = data.location.lat;
+  const lon = data.location.lon;
 
-        v.innerHTML = suhu + "°C";
-        l.innerHTML = lokasi;
-      },
+  v.innerHTML = `
+    <h3>${lokasi}</h3>
+    <p>Suhu: ${suhu}°C</p>
+    <p>Negara: ${negara}</p>
+    <p>Provinsi: ${region}</p>
+    <p>Latitude: ${lat}</p>
+    <p>Longitude: ${lon}</p>
+  `;
+
+  l.innerHTML = lokasi;
+}
+,
       error: function(err){
         console.log(err);
         alert("Gagal mengambil data cuaca. Periksa nama lokasi.");
