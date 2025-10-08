@@ -3,37 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cek Cuaca</title>
-  <style>
-    body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif; padding:24px; background:#f7f7f8;}
-    .wrap{max-width:680px;margin:auto}
-    .search{
-      display:flex; gap:8px; margin-bottom:16px;
-      background:#fff; padding:10px; border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,.06);
-    }
-    .search input{
-      flex:1; border:1px solid #e6e6e6; border-radius:10px; padding:12px 14px; font-size:16px; outline:none;
-    }
-    .search button{
-      border:0; padding:12px 16px; border-radius:10px; cursor:pointer; font-weight:600;
-      background:#111; color:#fff;
-    }
-    .card{
-      background:#fff; border-radius:18px; padding:20px; 
-      box-shadow:0 10px 24px rgba(0,0,0,.08);
-    }
-    .title{font-size:18px; font-weight:700; margin:0 0 8px}
-    .grid{display:grid; grid-template-columns:180px 1fr; row-gap:8px}
-    .label{color:#555}
-    .value{font-weight:600}
-    .temp{font-size:40px; font-weight:800; margin:8px 0 16px}
-    .muted{color:#777; font-size:14px; margin-top:8px}
-    .error{color:#b00020; font-weight:600; margin-top:10px}
-  </style>
+  <title>Cek Cuaca - Dark Glass Style</title>
+
+  <!-- Hubungkan ke CSS eksternal -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- jQuery CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 </head>
 <body>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
   <div class="wrap">
     <div class="search">
       <input id="q" type="text" placeholder="Cari lokasi (contoh: Yogyakarta, Bandung, 'Jakarta Selatan')" />
@@ -43,11 +21,11 @@
     <div id="tampilan" class="card" aria-live="polite">
       <p class="muted">Ketik lokasi lalu tekan <b>Cari</b> atau Enter.</p>
     </div>
+
     <p id="lokasi" class="muted"></p>
   </div>
 
   <script>
-    // NOTE: pakai HTTPS biar gak kena mixed-content error
     const API_KEY = "5c17df9cdb59443894363944250810";
     const $q = $("#q");
     const $btn = $("#btn");
@@ -68,10 +46,9 @@
       const loc = data.location || {};
       const cur = data.current || {};
 
-      // WeatherAPI: location.country, location.region, location.name, location.lat, location.lon
       const country = loc.country ?? "-";
-      const region  = loc.region ?? "-"; // provinsi / region
-      const name    = loc.name ?? "-";   // kota/area (bisa treat sbg “kota/kecamatan” tergantung granularitas dari API)
+      const region  = loc.region ?? "-";
+      const name    = loc.name ?? "-";
       const lat     = (loc.lat ?? "-");
       const lon     = (loc.lon ?? "-");
       const tempC   = (cur.temp_c ?? "-");
@@ -106,7 +83,6 @@
         method: "GET",
         success: function(data){
           renderResult(data);
-          // Simpan query terakhir di URL hash biar gampang reload
           location.hash = encodeURIComponent(q);
         },
         error: function(xhr){
@@ -119,13 +95,11 @@
       });
     }
 
-    // Event handlers
     $btn.on("click", () => search($q.val()));
     $q.on("keydown", (e) => {
       if (e.key === "Enter") search($q.val());
     });
 
-    // Auto-run dari hash jika ada (mis. share link)
     if (location.hash.length > 1){
       const initial = decodeURIComponent(location.hash.slice(1));
       $q.val(initial);
