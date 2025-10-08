@@ -1,9 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <style>
+  body { font-family: Arial, sans-serif; background: #f7f7f8; padding: 30px; }
+  .card {
+    background: white; padding: 20px; border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    max-width: 500px; margin: auto;
+  }
+  input, button {
+    padding: 10px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc;
+  }
+  button {
+    background: #111; color: white; cursor: pointer;
+  }
+  .loading { color: #555; font-style: italic; }
+  .error { color: red; font-weight: bold; }
+</style>
 </head>
 <body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
@@ -18,47 +31,53 @@
 <!-- Update script jadi fungsi pencarian -->
 <script>
   const API_KEY = "5c17df9cdb59443894363944250810";
+  const v = document.getElementById("tampilan");
+
+  function renderLoading(){
+    v.innerHTML = `<p class="loading">Mengambil data cuaca...</p>`;
+  }
+
+  function renderError(msg){
+    v.innerHTML = `<p class="error">${msg}</p>`;
+  }
 
   function search(q){
-    const urlapi = `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${encodeURIComponent(q)}&aqi=no`;
+    if(!q.trim()) return renderError("Masukkan nama kota!");
+    renderLoading();
+    const url = `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${encodeURIComponent(q)}&aqi=no`;
+
     $.ajax({
-      url: urlapi,
+      url: url,
       method: "GET",
-      <!-- Ubah isi success callback -->
-success: function(data){
-  const v = document.getElementById("tampilan");
-  const l = document.getElementById("lokasi");
+      success: function(data){
+        const suhu = data.current.temp_c;
+        const lokasi = data.location.name;
+        const negara = data.location.country;
+        const region = data.location.region;
+        const lat = data.location.lat;
+        const lon = data.location.lon;
 
-  const suhu = data.current.temp_c;
-  const lokasi = data.location.name;
-  const negara = data.location.country;
-  const region = data.location.region;
-  const lat = data.location.lat;
-  const lon = data.location.lon;
-
-  v.innerHTML = `
-    <h3>${lokasi}</h3>
-    <p>Suhu: ${suhu}°C</p>
-    <p>Negara: ${negara}</p>
-    <p>Provinsi: ${region}</p>
-    <p>Latitude: ${lat}</p>
-    <p>Longitude: ${lon}</p>
-  `;
-
-  l.innerHTML = lokasi;
-}
-,
-      error: function(err){
-        console.log(err);
-        alert("Gagal mengambil data cuaca. Periksa nama lokasi.");
+        v.innerHTML = `
+          <div class="card">
+            <h2>${lokasi}</h2>
+            <h3>${suhu}°C</h3>
+            <p>Negara: ${negara}</p>
+            <p>Provinsi: ${region}</p>
+            <p>Latitude: ${lat}</p>
+            <p>Longitude: ${lon}</p>
+          </div>
+        `;
+      },
+      error: function(){
+        renderError("Gagal memuat data. Coba periksa koneksi atau nama kota.");
       }
     });
   }
 
-  // default load Yogyakarta
+  // Default
   search("Yogyakarta");
 
-  // event handler
+  // Event
   document.getElementById("btn").addEventListener("click", function(){
     const query = document.getElementById("q").value;
     search(query);
