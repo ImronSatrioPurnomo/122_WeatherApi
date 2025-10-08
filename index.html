@@ -9,36 +9,48 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     CUACA : <p id="lokasi"></p>
     <hr>
-    <div id="tampilan"></div>
+    <!-- Tambahkan di atas tag <script> utama -->
+<div style="margin-bottom:10px;">
+  <input id="q" type="text" placeholder="Masukkan nama kota (misal: Bandung)">
+  <button id="btn">Cari</button>
+</div>
 
-    <!-- Perubahan dari commit 1 -->
+<!-- Update script jadi fungsi pencarian -->
 <script>
-  const urlapi = "https://api.weatherapi.com/v1/current.json?key=5c17df9cdb59443894363944250810&q=Yogyakarta&aqi=no";
-  $.ajax({
-    url: urlapi,
-    method: "GET",
-    success: function(data) {
-      console.log(data);
+  const API_KEY = "5c17df9cdb59443894363944250810";
 
-      const v = document.getElementById("tampilan"); // fix id typo
-      const l = document.getElementById("lokasi");
+  function search(q){
+    const urlapi = `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${encodeURIComponent(q)}&aqi=no`;
+    $.ajax({
+      url: urlapi,
+      method: "GET",
+      success: function(data){
+        const v = document.getElementById("tampilan");
+        const l = document.getElementById("lokasi");
 
-      // fix typo temp_C -> temp_c
-      let suhu = data.current.temp_c;
-      let lokasi = data.location.name;
+        let suhu = data.current.temp_c;
+        let lokasi = data.location.name;
 
-      if (v && l) { // prevent null innerHTML error
         v.innerHTML = suhu + "°C";
         l.innerHTML = lokasi;
-      } else {
-        console.error("Element not found!");
+      },
+      error: function(err){
+        console.log(err);
+        alert("Gagal mengambil data cuaca. Periksa nama lokasi.");
       }
-    },
-    error: function(err){
-      console.log(err);
-    }
+    });
+  }
+
+  // default load Yogyakarta
+  search("Yogyakarta");
+
+  // event handler
+  document.getElementById("btn").addEventListener("click", function(){
+    const query = document.getElementById("q").value;
+    search(query);
   });
 </script>
+
 
 </body>
 </html>
